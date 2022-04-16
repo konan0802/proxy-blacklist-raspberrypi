@@ -24,6 +24,14 @@ sudo apt-get install squid -y
 
 #### 設定内容の説明
 * `/etc/squid/squid.conf`<br>
+    ```bash
+    28  # ブラックリストに登録されているポートを拒否
+    29  acl blacklist dstdomain "/etc/squid/blacklist"
+    30  acl blacktime time SMTWHFA 00:00-20:00
+    31  acl blacktime2 time SMTWHFA 22:30-23:59
+    32  http_access deny blacklist blacktime
+    33  http_access deny blacklist blacktime2
+    ```
     * 29行目でブラックリスト（[blacklist](/blacklist)）を読み込む
     * 30, 31行目でブロックする曜日・時間を設定
         * S	日曜日
@@ -34,24 +42,15 @@ sudo apt-get install squid -y
         * F	金曜日
         * A	土曜日
     * 32, 33行目でブロックリストと曜日・時間設定を紐付け
-    ```bash
-    28  # ブラックリストに登録されているポートを拒否
-    29  acl blacklist dstdomain "/etc/squid/blacklist"
-    30  acl blacktime time SMTWHFA 00:00-20:00
-    31  acl blacktime2 time SMTWHFA 22:30-23:59
-    32  http_access deny blacklist blacktime
-    33  http_access deny blacklist blacktime2
-    ```
 * `/etc/squid/squid.conf`<br>
-    * ブラックリストとする特定サイトを指定
-    * 先頭に . をつけるとサブドメインを含めすべてブロックすることになる
     ```bash
     3  .youtube.com
     4  .twitter.com
     5  .facebook.com
     6  .instagram.com
     ```
-
+    * ブラックリストとする特定サイトを指定
+    * 先頭に . をつけるとサブドメインを含めすべてブロックすることになる
 ### ◇ 自動起動設定と設定ファイルの反映
 ```bash
 $ sudo systemctl enable squid.service
