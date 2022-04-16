@@ -32,8 +32,8 @@ sudo apt-get install squid -y
     30  http_access deny blacklist blacktime
     31  http_access deny blacklist blacktime2
     ```
-    * 29行目でブラックリスト（[blacklist](/blacklist)）を読み込む
-    * 30, 31行目でブロックする曜日・時間を設定
+    * 27行目でブラックリスト（[blacklist](/blacklist)）を読み込む
+    * 28, 29行目でブロックする曜日・時間を設定
         * S	日曜日
         * M	月曜日
         * T	火曜日
@@ -41,7 +41,7 @@ sudo apt-get install squid -y
         * H	木曜日
         * F	金曜日
         * A	土曜日
-    * 32, 33行目でブロックリストと曜日・時間設定を紐付け
+    * 30, 31行目でブロックリストと曜日・時間設定を紐付け
 * `/etc/squid/squid.conf`<br>
     ```bash
     1  .youtube.com
