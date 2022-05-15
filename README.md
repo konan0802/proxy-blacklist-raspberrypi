@@ -4,6 +4,13 @@ Raspberry Piをプロキシサーバーにして、特定のサイト・曜日�
 ## 仕様
 <img src="Flowchart.jpg">
 
+### ◇ stateの種類
+* Free：フリー時間
+* Able：利用可能時間
+* Block：利用不可能時間
+
+※ BlockIP：時間制限を行なっているIP（ドメイン）
+
 ## Raspberry Piの設定
 ### ◇ Raspberry PiのIPアドレスを固定にする
 * [Raspberry Pi のIPアドレスを固定にするには？](https://www.fabshop.jp/raspberry-pi-static-ip/)
