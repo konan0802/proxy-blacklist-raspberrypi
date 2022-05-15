@@ -1,6 +1,9 @@
 # proxy-blacklist-raspberrypi
 Raspberry Piをプロキシサーバーにして、特定のサイト・曜日・時間におけるアクセスをブロックする。
 
+## 仕様
+<img src="Flowchart.jpg">
+
 ## Raspberry Piの設定
 ### ◇ Raspberry PiのIPアドレスを固定にする
 * [Raspberry Pi のIPアドレスを固定にするには？](https://www.fabshop.jp/raspberry-pi-static-ip/)
@@ -10,6 +13,7 @@ Raspberry Piをプロキシサーバーにして、特定のサイト・曜日�
 sudo apt-get update
 sudo apt-get upgrade -y
 sudo apt-get install squid -y
+sudo apt-get install jq -y
 ```
 
 ### ◇ Squidの設定
@@ -19,38 +23,13 @@ sudo apt-get install squid -y
     ```
 2. `/etc/squid/squid.conf`を編集<br>
     ⇒ [squid.conf](/squid.conf)
-3. `/etc/squid/blacklist`を作成<br>
+3. `/etc/squid/ManageAccess.sh`を作成<br>
+    ⇒ [ManageAccess.sh](/ManageAccess.sh)
+4. `/etc/squid/AccessState.json`を作成<br>
+    ⇒ [AccessState.json](AccessState.json)
+5. `/etc/squid/blacklist`を作成<br>
     ⇒ [blacklist](/blacklist)
 
-#### 設定内容の説明
-* `/etc/squid/squid.conf`<br>
-    ```bash
-    26  # ブラックリストに登録されているポートを拒否
-    27  acl blacklist dstdomain "/etc/squid/blacklist"
-    28  acl blacktime time SMTWHFA 00:00-20:00
-    29  acl blacktime2 time SMTWHFA 22:30-23:59
-    30  http_access deny blacklist blacktime
-    31  http_access deny blacklist blacktime2
-    ```
-    * 27行目でブラックリスト（[blacklist](/blacklist)）を読み込む
-    * 28, 29行目でブロックする曜日・時間を設定
-        * S	日曜日
-        * M	月曜日
-        * T	火曜日
-        * W	水曜日
-        * H	木曜日
-        * F	金曜日
-        * A	土曜日
-    * 30, 31行目でブロックリストと曜日・時間設定を紐付け
-* `/etc/squid/squid.conf`<br>
-    ```bash
-    1  .youtube.com
-    2  .twitter.com
-    3  .facebook.com
-    4  .instagram.com
-    ```
-    * ブラックリストとする特定サイトを指定
-    * 先頭に . をつけるとサブドメインを含めすべてブロックすることになる
 ### ◇ 自動起動設定と設定ファイルの反映
 ```bash
 $ sudo systemctl enable squid.service
@@ -59,7 +38,7 @@ $ sudo systemctl restart squid.service
 
 ## ◇ アクセスログの確認
 ```bash
-$ cd /var/log/squid
+$ sudo tail /var/log/squid/access.log
 ```
 
 ## iPhoneのプロキシ利用設定
