@@ -57,6 +57,11 @@ $ sudo systemctl enable squid.service
 $ sudo systemctl restart squid.service
 ```
 
+## ◇ アクセスログの確認
+```bash
+$ cd /var/log/squid
+```
+
 ## iPhoneのプロキシ利用設定
 * [iPhoneでWi-Fiの接続時にプロキシを使うよう設定する方法](https://novlog.me/ios/proxy/)<br>
     * サーバ：Raspberry Pi固定IP
