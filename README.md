@@ -1,5 +1,6 @@
 # proxy-blacklist-raspberrypi
-Raspberry Piをプロキシサーバーにして、特定のサイト・曜日・時間におけるアクセスをブロックする。
+Raspberry Piをプロキシサーバーにして、特定のドメイン（各種SNS）における利用時間の制限を行う。<br>
+※ 時間の浪費防止
 
 ## 仕様
 <img src="Flowchart.jpg">
