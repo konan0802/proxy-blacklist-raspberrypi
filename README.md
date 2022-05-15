@@ -5,7 +5,7 @@ Raspberry Piをプロキシサーバーにして、特定のサイト・曜日�
 ### ◇ Raspberry PiのIPアドレスを固定にする
 * [Raspberry Pi のIPアドレスを固定にするには？](https://www.fabshop.jp/raspberry-pi-static-ip/)
 
-### ◇ Squidのインストール
+### ◇ [Squid](http://www.squid-cache.org/) のインストール
 ```bash
 sudo apt-get update
 sudo apt-get upgrade -y
