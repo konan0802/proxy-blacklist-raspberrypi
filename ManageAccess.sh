@@ -1,70 +1,113 @@
 #!/bin/sh
 
 # ブラックIP
-#blackIP[0]=".youtube.com"
-#blackIP[1]=".twitter.com"
-#blackIP[2]=".facebook.com"
-#blackIP[3]=".instagram.com"
-#blackIP[4]=".amazonvideo.com"
+blackIPs=(
+    ".youtube.com"
+    ".twitter.com"
+    ".facebook.com"
+    ".instagram.com"
+    ".amazonvideo.com"
+)
 
-write_json () {
-printf '{
-  "state":"%s",
-  "time":"%s"
-}' "${1}" "${2}" > AccessState.json
+# jsonに書き込み
+writeJson () {
+    printf '{"state":"%s","time":"%s"}' "${1}" "${2}" > AccessState.json
 }
 #time=`date +" %Y-%m-%d %H:%M:%S" -d "1 hour"`
 
-research_log () {
-while read ymd hms hostn
-do
-  ary
-} < /var/log/squid/access.log
+# 過去10分間のログにブラックIPが含まれるかを確認
+isBlackIPInAccessLog () {
+    inBlackIP=0
+    while read ymd hms x hostn
+    do
+        logDatetime=`date -d "${ymd} ${hms}" +%s`
+        if [ ${logDatetime} -ge ${1} ]; then
+            for blackIP in "${blackIPs[@]}" ; do
+                if [[ ${hostn} == *${blackIP}* ]]; then
+                    inBlackIP=1
+                fi
+            done
+        fi
+    done < /var/log/squid/access.log
 
-apply_blacklist () {
-
+    echo ${inBlackIP}
 }
 
-# AccessState.jsonを読み込み
+applyBlacklist () {
+    : > blacklist
+    for blackIP in "${blackIPs[@]}" ; do
+        echo ${blackIP} >> blacklist
+    done
+    sudo systemctl restart squid.service
+}
+
+removeBlacklist () {
+    : > blacklist
+    sudo systemctl restart squid.service
+}
+
+
+#-----------------------------------------------------------------
+
+# stateを取得
 state=$(cat AccessState.json | jq '.state' | sed 's/^.*"\(.*\)".*$/\1/')
 
-#  開放中の場合
+# 現時刻を取得
+nowTime=`date +%s`
+
+# 終了時刻を取得
+strEndTime=$(cat AccessState.json | jq '.time' | sed 's/^.*"\(.*\)".*$/\1/')
+
+
+#  Free(開放中)の場合
 if [ ${state} = "Free" ]; then
     echo "Free"
+    
+    before10mTime=`date -d "10 minute ago" +%s`
+    inBlackIP=`isBlackIPInAccessLog ${before10mTime}`
+    echo ${inBlackIP}
+    if [ ${inBlackIP} == 1 ]; then
+        after5mTime=`date +" %Y-%m-%d %H:%M:%S" -d "5 minute"`
+        writeJson "Able" "${after5mTime}"
+        exit 0
+    else
+        exit 0
+    fi
 
-# 利用時間中の場合
+# Able(利用時間中)の場合
 elif [ ${state} = "Able" ]; then
     echo "Able"
-
-# 制限中の場合
-else
-    strTime=$(cat AccessState.json | jq '.time' | sed 's/^.*"\(.*\)".*$/\1/')
-    freeTime=`date -d "${strTime}" +%s`
-    nowTime=`date +%s`
-
-    echo ${freeTime}
-    echo ${nowTime}
-
+    
     # 制限終了時間になっていない場合
-    if [ ${freeTime} -ge ${nowTime} ]; then
+    endTime=`date -d "${strEndTime}" +%s`
+    if [ ${endTime} -ge ${nowTime} ]; then
             echo "制限終了時間はまだ"
 	        exit 0
     # 制限終了時間になっていた場合
     else
 	    echo "制限終了時間が過ぎた"
-	    write_json "Free" ""
+	    applyBlacklist
+        after1hourTime=`date +" %Y-%m-%d %H:%M:%S" -d "1 hour"`
+        writeJson "Block" "${after1hourTime}"
+	    exit 0
+    fi
+
+# Block(制限中)の場合
+else
+    echo "Block"
+
+    # 制限終了時間になっていない場合
+    endTime=`date -d "${strEndTime}" +%s`
+    if [ ${endTime} -ge ${nowTime} ]; then
+            echo "制限終了時間はまだ"
+	        exit 0
+    # 制限終了時間になっていた場合
+    else
+	    echo "制限終了時間が過ぎた"
+        removeBlacklist
+	    writeJson "Free" ""
 	    exit 0
     fi
 fi
-
-# 過去1時間分のアクセスログを取得
-#while read BUF ; do
-#do
-#    ary=(`echo $BUF`) 
-#    echo ${ary[0]}
-#done < /var/log/squid/access.log
-
-
-# sudo systemctl restart squid.service
 
 exit 0
