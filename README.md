@@ -49,7 +49,7 @@ $ sudo systemctl restart squid.service
 * * * * * cd /etc/squid; bash ManageAccess.sh
 ```
 
-## ◇ アクセスログの確認
+### ◇ アクセスログの確認
 ```bash
 $ sudo tail /var/log/squid/access.log
 ```
