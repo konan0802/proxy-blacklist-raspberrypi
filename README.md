@@ -46,7 +46,7 @@ $ sudo systemctl restart squid.service
 
 ### ◇ cronの設定
 ```bash
-* * * * * bash /etc/squid/ManageAccess.sh
+* * * * * cd /etc/squid; bash ManageAccess.sh
 ```
 
 ## ◇ アクセスログの確認
