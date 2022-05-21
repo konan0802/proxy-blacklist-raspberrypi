@@ -44,6 +44,11 @@ $ sudo systemctl enable squid.service
 $ sudo systemctl restart squid.service
 ```
 
+### ◇ cronの設定
+```bash
+* * * * * bash /etc/squid/ManageAccess.sh
+```
+
 ## ◇ アクセスログの確認
 ```bash
 $ sudo tail /var/log/squid/access.log
