@@ -3,6 +3,7 @@
 # ブラックIP
 blackIPs=(
     ".youtube.com"
+    ".googlevideo.com"
     ".twitter.com"
     ".facebook.com"
     ".instagram.com"
@@ -63,7 +64,7 @@ strEndTime=$(cat AccessState.json | jq '.time' | sed 's/^.*"\(.*\)".*$/\1/')
 if [ ${state} = "Free" ]; then
     echo "Free"
     
-    before10mTime=`date -d "10 minute ago" +%s`
+    before10mTime=`date -d "1 minute ago" +%s`
     inBlackIP=`isBlackIPInAccessLog ${before10mTime}`
     echo ${inBlackIP}
     if [ ${inBlackIP} == 1 ]; then
