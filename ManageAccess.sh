@@ -47,6 +47,13 @@ removeBlacklist () {
     sudo systemctl restart squid.service
 }
 
+sendMesToLine () {
+    curl -X POST https://api.line.me/v2/bot/message/push \
+        -H 'Content-Type: application/json' \
+        -H 'Authorization: Bearer チャネルアクセストークン' \
+        -d @${1}
+}
+
 
 #-----------------------------------------------------------------
 
@@ -70,6 +77,7 @@ if [ ${state} = "Free" ]; then
     if [ ${inBlackIP} == 1 ]; then
         after5mTime=`date +" %Y-%m-%d %H:%M:%S" -d "5 minute"`
         writeJson "Able" "${after5mTime}"
+        sendMesToLine Able.json
         exit 0
     else
         exit 0
@@ -90,6 +98,7 @@ elif [ ${state} = "Able" ]; then
 	    applyBlacklist
         after1hourTime=`date +" %Y-%m-%d %H:%M:%S" -d "1 hour"`
         writeJson "Block" "${after1hourTime}"
+        sendMesToLine Block.json
 	    exit 0
     fi
 
@@ -107,6 +116,7 @@ else
 	    echo "制限終了時間が過ぎた"
         removeBlacklist
 	    writeJson "Free" ""
+        sendMesToLine Free.json
 	    exit 0
     fi
 fi
