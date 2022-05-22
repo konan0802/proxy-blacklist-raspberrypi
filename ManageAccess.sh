@@ -115,7 +115,7 @@ else
     else
 	    echo "制限終了時間が過ぎた"
         removeBlacklist
-	    writeJson "Free" ""
+        writeJson "Free" ""
         sendMesToLine Free.json
 	    exit 0
     fi
